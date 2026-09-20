@@ -1,0 +1,983 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="app-shell">
+
+    {% include "partials/sidebar.html" %}
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="search company-search-box">
+
+                <span class="search-icon">⌕</span>
+
+                <input
+                    type="text"
+                    id="companySearchInput"
+                    placeholder="Search company..."
+                    autocomplete="off"
+                >
+
+                <button
+                    type="button"
+                    id="companySearchButton"
+                >
+                    Search
+                </button>
+
+                <div
+                    id="companySearchResults"
+                    class="company-search-results"
+                ></div>
+
+            </div>
+
+
+            <div class="user-chip">
+
+                🔔
+
+                <span>
+                    {{ request.user.first_name|default:request.user.username }}
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- HERO -->
+
+        <section class="hero glass">
+
+            <div>
+
+                <div class="hero-icon">
+                    🛡
+                </div>
+
+                <h1>
+                    Welcome back,
+                    {{ request.user.first_name|default:request.user.username }}!
+                    👋
+                </h1>
+
+                <p>
+                    Verify before you apply.
+                    Stay safe from fake jobs and scams.
+                </p>
+
+            </div>
+
+            <strong>
+                “A few minutes of verification can save you from a big loss.”
+            </strong>
+
+        </section>
+
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+            <div class="stat blue">
+
+                <small>
+                    Total Checks
+                </small>
+
+                <b>
+                    {{ total }}
+                </b>
+
+                <span>
+                    Job verifications
+                </span>
+
+            </div>
+
+
+            <div class="stat green">
+
+                <small>
+                    Safe Jobs
+                </small>
+
+                <b>
+                    {{ safe }}
+                </b>
+
+                <span>
+                    Low risk
+                </span>
+
+            </div>
+
+
+            <div class="stat orange">
+
+                <small>
+                    Suspicious Jobs
+                </small>
+
+                <b>
+                    {{ suspicious }}
+                </b>
+
+                <span>
+                    Needs review
+                </span>
+
+            </div>
+
+
+            <div class="stat red">
+
+                <small>
+                    High Risk Jobs
+                </small>
+
+                <b>
+                    {{ high }}
+                </b>
+
+                <span>
+                    Stay away
+                </span>
+
+            </div>
+
+
+            <div class="stat purple">
+
+                <small>
+                    Scam Reports
+                </small>
+
+                <b>
+                    {{ reports }}
+                </b>
+
+                <span>
+                    Your reports
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- DASHBOARD GRID -->
+
+        <div class="grid-2">
+
+
+            <!-- RECENT JOB CHECKS -->
+
+            <section class="panel glass">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Recent Job Checks
+                    </h2>
+
+                    <a href="{% url 'check_job' %}">
+                        New Check →
+                    </a>
+
+                </div>
+
+
+                <table>
+
+                    <tr>
+
+                        <th>
+                            Job / Company
+                        </th>
+
+                        <th>
+                            Risk
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                    </tr>
+
+
+                    {% for c in checks %}
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                {{ c.title }}
+                            </b>
+
+                            <small>
+                                {{ c.company }}
+                            </small>
+
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="score {{ c.risk_level|slugify }}"
+                            >
+                                {{ c.risk_score }}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="badge {{ c.risk_level|slugify }}"
+                            >
+                                {{ c.risk_level }}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            {{ c.created_at|date:"d M" }}
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            class="empty"
+                        >
+                            No checks yet.
+                            Start your first verification.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </table>
+
+            </section>
+
+
+            <!-- RISK OVERVIEW -->
+
+            <section class="panel glass">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Risk Overview
+                    </h2>
+
+                    <span>
+                        Live
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="donut"
+                    style="
+                        --safe:{{ safe }};
+                        --susp:{{ suspicious }};
+                        --high:{{ high }};
+                    "
+                >
+
+                    <div>
+
+                        {{ total }}
+
+                        <small>
+                            Total Checks
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="legend">
+
+                    <span>
+                        ● Safe {{ safe }}
+                    </span>
+
+                    <span>
+                        ● Suspicious {{ suspicious }}
+                    </span>
+
+                    <span>
+                        ● High Risk {{ high }}
+                    </span>
+
+                </div>
+
+
+                <div class="mini-chart">
+
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- QUICK ACTIONS -->
+
+        <div class="quick-grid">
+
+
+            <a
+                class="quick blue"
+                href="{% url 'check_job' %}"
+            >
+
+                🔗
+
+                <b>
+                    Check a Job
+                </b>
+
+                <small>
+                    Paste job link or details
+                </small>
+
+            </a>
+
+
+            <a
+                class="quick green"
+                href="{% url 'screenshot' %}"
+            >
+
+                ▣
+
+                <b>
+                    Scan Screenshot
+                </b>
+
+                <small>
+                    Upload job evidence
+                </small>
+
+            </a>
+
+
+            <a
+                class="quick purple"
+                href="{% url 'company_check' %}"
+            >
+
+                ▦
+
+                <b>
+                    Check Company
+                </b>
+
+                <small>
+                    Verify company details
+                </small>
+
+            </a>
+
+
+            <a
+                class="quick red"
+                href="{% url 'scam_reports' %}"
+            >
+
+                ⚠
+
+                <b>
+                    Report a Scam
+                </b>
+
+                <small>
+                    Help others stay safe
+                </small>
+
+            </a>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     COMPANY SEARCH
+     ========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const input =
+        document.getElementById("companySearchInput");
+
+    const button =
+        document.getElementById("companySearchButton");
+
+    const resultsBox =
+        document.getElementById("companySearchResults");
+
+
+    if (
+        !input ||
+        !resultsBox
+    ) {
+        return;
+    }
+
+
+    let timer = null;
+
+
+    /* =========================================================
+       MOVE RESULTS OUTSIDE TOPBAR
+       ========================================================= */
+
+    document.body.appendChild(resultsBox);
+
+
+    resultsBox.style.position = "fixed";
+
+    resultsBox.style.zIndex =
+        "2147483647";
+
+    resultsBox.style.display =
+        "none";
+
+
+    /* =========================================================
+       POSITION RESULTS
+       ========================================================= */
+
+    function positionResults() {
+
+        const rect =
+            input.getBoundingClientRect();
+
+
+        const width =
+            Math.min(
+                Math.max(rect.width, 420),
+                590
+            );
+
+
+        resultsBox.style.left =
+            rect.left + "px";
+
+
+        resultsBox.style.top =
+            (rect.bottom + 10) + "px";
+
+
+        resultsBox.style.width =
+            width + "px";
+
+    }
+
+
+    /* =========================================================
+       SHOW RESULTS
+       ========================================================= */
+
+    function showResults() {
+
+        positionResults();
+
+        resultsBox.style.display =
+            "block";
+
+        resultsBox.classList.add(
+            "active"
+        );
+
+    }
+
+
+    /* =========================================================
+       HIDE RESULTS
+       ========================================================= */
+
+    function hideResults() {
+
+        resultsBox.style.display =
+            "none";
+
+        resultsBox.classList.remove(
+            "active"
+        );
+
+    }
+
+
+    /* =========================================================
+       LOADING
+       ========================================================= */
+
+    function showLoading() {
+
+        resultsBox.innerHTML = `
+
+            <div class="search-loading">
+
+                🔍 Searching companies...
+
+            </div>
+
+        `;
+
+        showResults();
+
+    }
+
+
+    /* =========================================================
+       SEARCH COMPANY
+       ========================================================= */
+
+    function searchCompanies() {
+
+        const query =
+            input.value.trim();
+
+
+        if (query.length < 2) {
+
+            resultsBox.innerHTML = "";
+
+            hideResults();
+
+            return;
+
+        }
+
+
+        showLoading();
+
+
+        fetch(
+            `/api/company-search/?q=${encodeURIComponent(query)}`
+        )
+
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Company search failed"
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(data => {
+
+            if (
+                !data.success ||
+                !Array.isArray(data.results) ||
+                data.results.length === 0
+            ) {
+
+                resultsBox.innerHTML = `
+
+                    <div class="search-empty">
+
+                        No company found for
+                        "<strong>${escapeHtml(query)}</strong>"
+
+                    </div>
+
+                `;
+
+                showResults();
+
+                return;
+
+            }
+
+
+            resultsBox.innerHTML = "";
+
+
+            data.results.forEach(
+                company => {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "company-result";
+
+
+                    const icon =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    icon.className =
+                        "company-result-icon";
+
+
+                    icon.textContent =
+                        "🏢";
+
+
+                    const info =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    info.className =
+                        "company-result-info";
+
+
+                    const name =
+                        document.createElement(
+                            "strong"
+                        );
+
+
+                    name.textContent =
+                        company.name ||
+                        "Unknown Company";
+
+
+                    const description =
+                        document.createElement(
+                            "small"
+                        );
+
+
+                    description.textContent =
+                        company.description ||
+                        "Company information available";
+
+
+                    info.appendChild(name);
+
+                    info.appendChild(
+                        description
+                    );
+
+
+                    item.appendChild(icon);
+
+                    item.appendChild(info);
+
+
+                    /* CLICK COMPANY */
+
+                    item.addEventListener(
+                        "click",
+                        function () {
+
+                            const companyName =
+                                company.name ||
+                                "";
+
+
+                            if (!companyName) {
+                                return;
+                            }
+
+
+                            window.location.href =
+                                `/company-check/?company=${encodeURIComponent(companyName)}`;
+
+                        }
+                    );
+
+
+                    resultsBox.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+
+            showResults();
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Company Search Error:",
+                error
+            );
+
+
+            resultsBox.innerHTML = `
+
+                <div class="search-empty">
+
+                    ⚠️ Search failed.
+
+                    <br>
+
+                    Please try again.
+
+                </div>
+
+            `;
+
+
+            showResults();
+
+        });
+
+    }
+
+
+    /* =========================================================
+       SEARCH INPUT
+       ========================================================= */
+
+    input.addEventListener(
+        "input",
+        function () {
+
+            clearTimeout(timer);
+
+
+            const query =
+                input.value.trim();
+
+
+            if (query.length < 2) {
+
+                hideResults();
+
+                return;
+
+            }
+
+
+            timer =
+                setTimeout(
+                    searchCompanies,
+                    400
+                );
+
+        }
+    );
+
+
+    /* =========================================================
+       SEARCH BUTTON
+       ========================================================= */
+
+    if (button) {
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                clearTimeout(timer);
+
+                searchCompanies();
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       ENTER KEY
+       ========================================================= */
+
+    input.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                clearTimeout(timer);
+
+                searchCompanies();
+
+            }
+
+
+            if (event.key === "Escape") {
+
+                hideResults();
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       CLICK OUTSIDE
+       ========================================================= */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const searchBox =
+                document.querySelector(
+                    ".company-search-box"
+                );
+
+
+            if (
+                searchBox &&
+                !searchBox.contains(
+                    event.target
+                ) &&
+                !resultsBox.contains(
+                    event.target
+                )
+            ) {
+
+                hideResults();
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       WINDOW RESIZE
+       ========================================================= */
+
+    window.addEventListener(
+        "resize",
+        function () {
+
+            if (
+                resultsBox.classList.contains(
+                    "active"
+                )
+            ) {
+
+                positionResults();
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       PAGE SCROLL
+       ========================================================= */
+
+    window.addEventListener(
+        "scroll",
+        function () {
+
+            if (
+                resultsBox.classList.contains(
+                    "active"
+                )
+            ) {
+
+                positionResults();
+
+            }
+
+        },
+        true
+    );
+
+
+    /* =========================================================
+       ESCAPE HTML
+       ========================================================= */
+
+    function escapeHtml(value) {
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+});
+
+</script>
+
+
+{% endblock %}

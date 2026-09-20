@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}
+    User Login | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <div class="auth-card glass">
+
+        <div class="auth-logo">
+            🛡
+        </div>
+
+        <h1>
+            Welcome Back
+        </h1>
+
+        <p>
+            Verify before you apply.
+        </p>
+
+
+        {% if messages %}
+
+            {% for m in messages %}
+
+                <div class="notice">
+                    {{ m }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <label>
+                Username
+            </label>
+
+            <input
+                name="username"
+                required
+            >
+
+
+            <label>
+                Password
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                required
+            >
+
+
+            <button class="btn primary full">
+                Login
+            </button>
+
+        </form>
+
+
+        <div class="auth-links">
+
+            <a href="{% url 'signup' %}">
+                Create account
+            </a>
+
+            <a href="{% url 'admin_login' %}">
+                Admin login
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

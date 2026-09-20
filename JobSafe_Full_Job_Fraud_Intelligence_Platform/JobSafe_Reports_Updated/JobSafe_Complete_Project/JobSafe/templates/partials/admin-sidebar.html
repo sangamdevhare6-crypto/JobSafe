@@ -1,0 +1,13 @@
+<aside class="sidebar admin-sidebar">
+<a class="brand" href="{% url 'admin_dashboard' %}"><span class="brand-shield">⚡</span><span><b>Job<span>Safe</span></b><small>Admin Intelligence Center</small></span></a>
+<nav>
+<a href="{% url 'admin_dashboard' %}">⌂ <span>Dashboard</span></a>
+<a href="{% url 'admin_analytics' %}" class="{% if active == 'admin_analytics' %}active{% endif %}">◒ <span>Platform Analytics</span></a>
+<a href="{% url 'admin_intelligence' %}" class="{% if active == 'intelligence' %}active{% endif %}">◈ <span>Threat Intelligence</span></a>
+<a href="{% url 'admin_users' %}">♙ <span>User Management</span></a>
+<a href="{% url 'admin_reports' %}" class="{% if active == 'reports' %}active{% endif %}">⚠ <span>Scam Reports</span></a>
+<a href="{% url 'admin_companies' %}" class="{% if active == 'companies' %}active{% endif %}">▦ <span>Companies</span></a>
+<a href="{% url 'admin_logs' %}" class="{% if active == 'logs' %}active{% endif %}">≡ <span>Audit Logs</span></a>
+<a href="{% url 'admin_system' %}" class="{% if active == 'system' %}active{% endif %}">⚙ <span>System Monitor</span></a>
+<a href="/admin/">▣ <span>Django Admin</span></a>
+</nav><div class="sidebar-bottom"><a class="logout" href="{% url 'logout' %}">⇥ <span>Logout</span></a></div></aside>

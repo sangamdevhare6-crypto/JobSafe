@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}
+    JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="landing">
+
+    <div class="landing-card glass">
+
+        <div class="logo-big">
+            🛡
+        </div>
+
+        <h1>
+            Job<span>Safe</span>
+        </h1>
+
+        <p>
+            Check Before You Apply.
+        </p>
+
+        <p class="muted">
+            Verify jobs, recruiters and companies before a scam becomes a loss.
+        </p>
+
+
+        <div class="actions">
+
+            <a
+                class="btn primary"
+                href="{% url 'login' %}"
+            >
+                User Login
+            </a>
+
+            <a
+                class="btn ghost"
+                href="{% url 'signup' %}"
+            >
+                Create Account
+            </a>
+
+        </div>
+
+
+        <a
+            class="admin-link"
+            href="{% url 'admin_login' %}"
+        >
+            Admin Login →
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

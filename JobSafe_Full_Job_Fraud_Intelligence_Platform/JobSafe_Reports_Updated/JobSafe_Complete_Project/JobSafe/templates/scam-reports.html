@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Scam Reports | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="app-shell">
+
+    {% include "partials/sidebar.html" %}
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <h2>
+                    Scam Reports
+                </h2>
+
+                <p class="muted">
+                    Report suspicious jobs, recruiters and companies to protect other applicants.
+                </p>
+
+            </div>
+
+            <div class="topbar-status">
+
+                <span class="status-dot"></span>
+
+                Community Protection
+
+            </div>
+
+        </header>
+
+
+        {% if messages %}
+
+            {% for m in messages %}
+
+                <div class="notice success">
+                    ✓ {{ m }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <div class="report-stats">
+
+            <div class="mini-stat glass">
+
+                <span class="mini-icon">
+                    🛡
+                </span>
+
+                <div>
+
+                    <strong>
+                        Report
+                    </strong>
+
+                    <small>
+                        Help protect other job seekers
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="mini-stat glass">
+
+                <span class="mini-icon">
+                    🔎
+                </span>
+
+                <div>
+
+                    <strong>
+                        Evidence
+                    </strong>
+
+                    <small>
+                        Share useful links and details
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="mini-stat glass">
+
+                <span class="mini-icon">
+                    ⚡
+                </span>
+
+                <div>
+
+                    <strong>
+                        Review
+                    </strong>
+
+                    <small>
+                        Reports are checked by admins
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="grid-2 report-grid">
+
+
+            <section class="panel glass form-panel">
+
+                <div class="panel-title">
+
+                    <div>
+
+                        <h2>
+                            Report a Scam
+                        </h2>
+
+                        <p class="muted">
+                            Provide as much verified information as possible.
+                        </p>
+
+                    </div>
+
+                    <span class="report-badge">
+                        NEW REPORT
+                    </span>
+
+                </div>
+
+
+                <form method="post" id="scamReportForm">
+
+                    {% csrf_token %}
+
+
+                    <div class="form-grid">
+
+                        <div>
+
+                            <label>
+                                Company Name *
+                            </label>
+
+                            <input
+                                name="company"
+                                required
+                                placeholder="e.g. ABC Technologies"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                Job / Internship Title *
+                            </label>
+
+                            <input
+                                name="job_title"
+                                required
+                                placeholder="e.g. Software Intern"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                Recruiter Name
+                            </label>
+
+                            <input
+                                name="recruiter_name"
+                                placeholder="Recruiter's name"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                Recruiter Contact
+                            </label>
+
+                            <input
+                                name="recruiter_contact"
+                                placeholder="Email / phone / WhatsApp / Telegram"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                Job URL
+                            </label>
+
+                            <input
+                                type="url"
+                                name="job_url"
+                                placeholder="https://..."
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                Scam Type
+                            </label>
+
+                            <select name="scam_type">
+
+                                {% for value,label in scam_types %}
+
+                                    <option value="{{ value }}">
+                                        {{ label }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                Payment Requested
+                            </label>
+
+                            <input
+                                name="payment_requested"
+                                placeholder="e.g. ₹2,999 registration fee"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                Evidence URL
+                            </label>
+
+                            <input
+                                type="url"
+                                name="evidence_url"
+                                placeholder="Screenshot / post / evidence link"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <label>
+                        What happened? *
+                    </label>
+
+                    <textarea
+                        name="description"
+                        rows="7"
+                        required
+                        placeholder="Tell us what the recruiter/company asked you to do, what looked suspicious, and any payment or personal-information request..."
+                    ></textarea>
+
+
+                    <div class="form-hint">
+
+                        ⚠ Do not share passwords, OTPs, bank PINs or other sensitive credentials in this report.
+
+                    </div>
+
+
+                    <button
+                        class="btn primary full"
+                        type="submit"
+                    >
+                        🚨 Submit Scam Report
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <section class="panel glass">
+
+                <div class="panel-title">
+
+                    <div>
+
+                        <h2>
+                            Your Reports
+                        </h2>
+
+                        <p class="muted">
+                            Track reports you have submitted.
+                        </p>
+
+                    </div>
+
+                    <span class="count-pill">
+                        {{ reports|length }}
+                    </span>
+
+                </div>
+
+
+                <div class="report-list">
+
+                    {% for r in reports %}
+
+                        <article class="report-card status-{{ r.status|slugify }}">
+
+                            <div class="report-card-top">
+
+                                <div>
+
+                                    <h3>
+                                        {{ r.company }}
+                                    </h3>
+
+                                    <span>
+                                        {{ r.job_title }}
+                                    </span>
+
+                                </div>
+
+
+                                <span
+                                    class="badge {% if r.status == 'Verified Scam' %}high-risk{% elif r.status == 'Rejected' %}safe{% else %}suspicious{% endif %}"
+                                >
+                                    {{ r.status }}
+                                </span>
+
+                            </div>
+
+
+                            <p>
+                                {{ r.description|truncatechars:130 }}
+                            </p>
+
+
+                            <div class="report-meta">
+
+                                <span>
+                                    {{ r.scam_type }}
+                                </span>
+
+                                <span>
+                                    {{ r.created_at|date:"d M Y, h:i A" }}
+                                </span>
+
+                            </div>
+
+
+                            {% if r.admin_note %}
+
+                                <div class="admin-note">
+
+                                    <b>
+                                        Admin note:
+                                    </b>
+
+                                    {{ r.admin_note }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </article>
+
+
+                    {% empty %}
+
+                        <div class="empty-state">
+
+                            <div class="empty-icon">
+                                🛡️
+                            </div>
+
+                            <h3>
+                                No reports yet
+                            </h3>
+
+                            <p>
+                                Your submitted scam reports will appear here.
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

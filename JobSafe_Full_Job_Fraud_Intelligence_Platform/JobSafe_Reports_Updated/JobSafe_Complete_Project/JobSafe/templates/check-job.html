@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Check a Job | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="app-shell">
+
+    {% include "partials/sidebar.html" %}
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <h2>
+                    Check a Job
+                </h2>
+
+                <p class="muted">
+                    Analyze a job posting before you apply.
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <div class="grid-2">
+
+            <section class="panel glass form-panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Job Verification
+                    </h2>
+
+                    <span>
+                        AI-ready scanner
+                    </span>
+
+                </div>
+
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <label>
+                        Job Title
+                    </label>
+
+                    <input
+                        name="title"
+                        placeholder="e.g. Software Developer Intern"
+                        required
+                    >
+
+
+                    <label>
+                        Company
+                    </label>
+
+                    <input
+                        name="company"
+                        placeholder="Company name"
+                    >
+
+
+                    <label>
+                        Job URL
+                    </label>
+
+                    <input
+                        name="url"
+                        placeholder="https://example.com/job"
+                    >
+
+
+                    <label>
+                        Job Description / Recruiter Message
+                    </label>
+
+                    <textarea
+                        name="description"
+                        rows="9"
+                        placeholder="Paste the job description, WhatsApp message or recruiter text..."
+                    ></textarea>
+
+
+                    <button class="btn primary full">
+                        Analyze Job →
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <section class="panel glass result-panel">
+
+                {% if result %}
+
+                    <div class="result-icon {{ result.obj.risk_level|slugify }}">
+                        🛡
+                    </div>
+
+                    <h2>
+                        {{ result.obj.risk_level }}
+                    </h2>
+
+                    <div class="big-score">
+                        {{ result.obj.risk_score }}
+
+                        <small>
+                            /100
+                        </small>
+                    </div>
+
+                    <p>
+                        Job Risk Score
+                    </p>
+
+                    <hr>
+
+                    <h3>
+                        Signals Found
+                    </h3>
+
+                    <ul>
+
+                        {% for r in result.flags %}
+
+                            <li>
+                                {{ r }}
+                            </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+
+                    <a
+                        class="btn ghost"
+                        href="{% url 'scam_reports' %}"
+                    >
+                        Report This Job
+                    </a>
+
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        🛡
+
+                        <h2>
+                            Ready to Verify
+                        </h2>
+
+                        <p>
+                            Enter job details and our starter risk engine will identify common scam indicators.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

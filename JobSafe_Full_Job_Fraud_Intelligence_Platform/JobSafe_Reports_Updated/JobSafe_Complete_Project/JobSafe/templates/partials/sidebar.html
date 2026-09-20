@@ -1,0 +1,22 @@
+<aside class="sidebar">
+  <a class="brand" href="{% url 'dashboard' %}"><span class="brand-shield">⚡</span><span><b>Job<span>Safe</span></b><small>Fraud Intelligence Platform</small></span></a>
+  <nav>
+    <a href="{% url 'dashboard' %}" class="{% if active == 'dashboard' %}active{% endif %}">⌂ <span>Dashboard</span></a>
+    <a href="{% url 'check_job' %}">⌕ <span>AI Job Scanner</span></a>
+    <a href="{% url 'company_check' %}" class="{% if active == 'company' %}active{% endif %}">▦ <span>Company Intelligence</span></a>
+    <a href="{% url 'screenshot' %}">▣ <span>Evidence Scanner</span></a>
+    <a href="{% url 'scan_history' %}" class="{% if active == 'history' %}active{% endif %}">◷ <span>Scan History</span></a>
+    <a href="{% url 'risk_analytics' %}" class="{% if active == 'analytics' %}active{% endif %}">◒ <span>Risk Analytics</span></a>
+    <a href="{% url 'threat_center' %}" class="{% if active == 'threat' %}active{% endif %}">⚠ <span>Threat Center</span></a>
+    <a href="{% url 'alerts' %}" class="{% if active == 'alerts' %}active{% endif %}">◉ <span>Alerts</span></a>
+    <a href="{% url 'scam_reports' %}" class="{% if active == 'reports' %}active{% endif %}">⚑ <span>Scam Reports</span></a>
+    <a href="{% url 'evidence_vault' %}" class="{% if active == 'evidence' %}active{% endif %}">▣ <span>Evidence Vault</span></a>
+    <a href="{% url 'safety_guide' %}" class="{% if active == 'guide' %}active{% endif %}">▤ <span>Safety Center</span></a>
+    <a href="{% url 'resources' %}" class="{% if active == 'resources' %}active{% endif %}">◇ <span>Resources</span></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a href="{% url 'profile' %}" class="{% if active == 'profile' %}active{% endif %}">◉ <span>Profile</span></a>
+    <a href="{% url 'security_settings' %}" class="{% if active == 'security' %}active{% endif %}">⚙ <span>Security</span></a>
+    <a class="logout" href="{% url 'logout' %}">⇥ <span>Logout</span></a>
+  </div>
+</aside>

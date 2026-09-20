@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Report Intelligence | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="app-shell">
+
+    {% include "partials/admin-sidebar.html" %}
+
+    <main class="main">
+
+
+        <!-- Topbar -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h2>
+                    Scam Report Intelligence
+                </h2>
+
+                <p class="muted">
+                    Review, verify and manage community-submitted scam reports.
+                </p>
+
+            </div>
+
+
+            <div class="topbar-status">
+
+                <span class="status-dot danger"></span>
+
+                Admin Review Center
+
+            </div>
+
+        </header>
+
+
+        <!-- Messages -->
+
+        {% if messages %}
+
+            {% for m in messages %}
+
+                <div class="notice success">
+                    ✓ {{ m }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <!-- Report Statistics -->
+
+        <div class="report-admin-stats">
+
+
+            <a
+                href="{% url 'admin_reports' %}"
+                class="admin-stat glass"
+            >
+
+                <span>
+                    📋
+                </span>
+
+                <div>
+
+                    <strong>
+                        {{ pending_count }}
+                    </strong>
+
+                    <small>
+                        Pending
+                    </small>
+
+                </div>
+
+            </a>
+
+
+            <a
+                href="{% url 'admin_reports' %}?status=Under+Review"
+                class="admin-stat glass"
+            >
+
+                <span>
+                    🔍
+                </span>
+
+                <div>
+
+                    <strong>
+                        {{ review_count }}
+                    </strong>
+
+                    <small>
+                        Under Review
+                    </small>
+
+                </div>
+
+            </a>
+
+
+            <a
+                href="{% url 'admin_reports' %}?status=Verified+Scam"
+                class="admin-stat glass"
+            >
+
+                <span>
+                    🚨
+                </span>
+
+                <div>
+
+                    <strong>
+                        {{ verified_count }}
+                    </strong>
+
+                    <small>
+                        Verified Scams
+                    </small>
+
+                </div>
+
+            </a>
+
+
+            <a
+                href="{% url 'admin_reports' %}?status=Rejected"
+                class="admin-stat glass"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                <div>
+
+                    <strong>
+                        {{ rejected_count }}
+                    </strong>
+
+                    <small>
+                        Rejected
+                    </small>
+
+                </div>
+
+            </a>
+
+        </div>
+
+
+        <!-- Community Reports -->
+
+        <section class="panel glass">
+
+            <div class="panel-title">
+
+                <div>
+
+                    <h2>
+                        Community Reports
+                    </h2>
+
+                    <p class="muted">
+                        Use the actions on each report to update its review status.
+                    </p>
+
+                </div>
+
+
+                <span class="count-pill">
+                    {{ reports|length }} results
+                </span>
+
+            </div>
+
+
+            <div class="admin-report-list">
+
+
+                {% for r in reports %}
+
+
+                <article class="admin-report-card">
+
+
+                    <!-- Report Header -->
+
+                    <div class="admin-report-head">
+
+                        <div>
+
+                            <span class="report-id">
+                                REPORT #{{ r.id }}
+                            </span>
+
+                            <h3>
+
+                                {{ r.company }}
+
+                                <span>
+                                    •
+                                </span>
+
+                                {{ r.job_title }}
+
+                            </h3>
+
+                            <small>
+
+                                Submitted by
+                                {{ r.user.username }}
+
+                                ·
+
+                                {{ r.created_at|date:"d M Y, h:i A" }}
+
+                            </small>
+
+                        </div>
+
+
+                        <span
+                            class="badge
+                            {% if r.status == 'Verified Scam' %}
+                                high-risk
+                            {% elif r.status == 'Rejected' %}
+                                safe
+                            {% else %}
+                                suspicious
+                            {% endif %}"
+                        >
+
+                            {{ r.status }}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- Report Details -->
+
+                    <div class="admin-report-body">
+
+
+                        <div class="detail-chips">
+
+
+                            <span>
+                                🏷 {{ r.scam_type }}
+                            </span>
+
+
+                            {% if r.recruiter_name %}
+
+                                <span>
+                                    👤 {{ r.recruiter_name }}
+                                </span>
+
+                            {% endif %}
+
+
+                            {% if r.recruiter_contact %}
+
+                                <span>
+                                    📞 {{ r.recruiter_contact }}
+                                </span>
+
+                            {% endif %}
+
+
+                            {% if r.payment_requested %}
+
+                                <span>
+                                    💰 {{ r.payment_requested }}
+                                </span>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                        <p>
+                            {{ r.description }}
+                        </p>
+
+
+                        <!-- Evidence Links -->
+
+                        <div class="evidence-row">
+
+
+                            {% if r.job_url %}
+
+                                <a
+                                    href="{{ r.job_url }}"
+                                    target="_blank"
+                                    rel="noopener"
+                                >
+                                    🔗 Job URL
+                                </a>
+
+                            {% endif %}
+
+
+                            {% if r.evidence_url %}
+
+                                <a
+                                    href="{{ r.evidence_url }}"
+                                    target="_blank"
+                                    rel="noopener"
+                                >
+                                    📎 Evidence
+                                </a>
+
+                            {% endif %}
+
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Admin Actions -->
+
+                    <form
+                        method="post"
+                        class="report-action-form"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <input
+                            type="hidden"
+                            name="report_id"
+                            value="{{ r.id }}"
+                        >
+
+
+                        <input
+                            type="text"
+                            name="admin_note"
+                            placeholder="Optional admin note..."
+                        >
+
+
+                        <button
+                            name="action"
+                            value="Under Review"
+                            class="btn small"
+                        >
+                            Review
+                        </button>
+
+
+                        <button
+                            name="action"
+                            value="Verified Scam"
+                            class="btn small danger-btn"
+                        >
+                            Verify Scam
+                        </button>
+
+
+                        <button
+                            name="action"
+                            value="Rejected"
+                            class="btn small ghost-btn"
+                        >
+                            Reject
+                        </button>
+
+                    </form>
+
+
+                </article>
+
+
+                {% empty %}
+
+
+                <!-- Empty State -->
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ✓
+                    </div>
+
+                    <h3>
+                        No reports found
+                    </h3>
+
+                    <p>
+                        There are no reports matching this filter.
+                    </p>
+
+                </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+{% endblock %}

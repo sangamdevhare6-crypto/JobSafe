@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Companies | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="app-shell">
+
+    {% include "partials/admin-sidebar.html" %}
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <h2>Companies</h2>
+
+                <p class="muted">
+                    Company verification records and user activity.
+                </p>
+            </div>
+
+        </header>
+
+
+        <section class="panel glass">
+
+            <div class="panel-header">
+
+                <div>
+                    <h3>Company Check History</h3>
+
+                    <p class="muted">
+                        See which user checked which company.
+                    </p>
+                </div>
+
+                <div class="stat-pill">
+                    {{ companies|length }} Checks
+                </div>
+
+            </div>
+
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>User</th>
+                            <th>Company</th>
+                            <th>Website</th>
+                            <th>Risk</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for c in companies %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="user-cell">
+
+                                    <div class="user-avatar">
+                                        {{ c.user.username|first|upper }}
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ c.user.username }}
+                                        </strong>
+
+                                        <small>
+                                            {{ c.user.email|default:"No email" }}
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <strong>
+                                    {{ c.company }}
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if c.website %}
+
+                                    <a
+                                        href="{{ c.website }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {{ c.website }}
+                                    </a>
+
+                                {% else %}
+
+                                    <span class="muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <strong>
+                                    {{ c.risk_score }}/100
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if c.status == "High Risk" %}
+
+                                    <span class="status-badge high">
+                                        High Risk
+                                    </span>
+
+                                {% elif c.status == "Suspicious" %}
+
+                                    <span class="status-badge suspicious">
+                                        Suspicious
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge safe">
+                                        Low Risk
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {{ c.created_at|date:"d M Y, h:i A" }}
+
+                            </td>
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="empty"
+                            >
+
+                                <div class="empty-state">
+
+                                    <div class="empty-icon">
+                                        🏢
+                                    </div>
+
+                                    <h3>
+                                        No Company Checks Yet
+                                    </h3>
+
+                                    <p>
+                                        Company verification activity
+                                        will appear here.
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+{% endblock %}

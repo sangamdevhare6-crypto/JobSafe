@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Company Check | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="app-shell">
+
+    {% include "partials/sidebar.html" %}
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <h2>
+                    Company Check
+                </h2>
+
+                <p class="muted">
+                    Verify company details before trusting a recruiter.
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <div class="grid-2">
+
+            <section class="panel glass form-panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Company Verification
+                    </h2>
+
+                </div>
+
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <label>
+                        Company Name
+                    </label>
+
+                    <input
+                        name="company"
+                        placeholder="e.g. TCS"
+                        required
+                    >
+
+
+                    <label>
+                        Official Website
+                    </label>
+
+                    <input
+                        name="website"
+                        placeholder="https://company.com"
+                    >
+
+
+                    <label>
+                        Recruiter Email Domain
+                    </label>
+
+                    <input
+                        name="domain"
+                        placeholder="careers@company.com"
+                    >
+
+
+                    <button class="btn primary full">
+                        Check Company →
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <section class="panel glass result-panel">
+
+                {% if result %}
+
+                    <div class="result-icon">
+                        ✓
+                    </div>
+
+                    <h2>
+                        {{ result.status }}
+                    </h2>
+
+                    <div class="big-score">
+
+                        {{ result.risk }}
+
+                        <small>
+                            /100 risk
+                        </small>
+
+                    </div>
+
+                    <p>
+                        {{ result.company }}
+                    </p>
+
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        🏢
+
+                        <h2>
+                            Company Trust Check
+                        </h2>
+
+                        <p>
+                            Compare website and recruiter-domain signals.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>=]
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

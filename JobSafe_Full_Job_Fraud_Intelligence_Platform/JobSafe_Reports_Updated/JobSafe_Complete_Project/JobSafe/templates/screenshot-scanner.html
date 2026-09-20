@@ -1,0 +1,795 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Screenshot Scanner | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="app-shell">
+
+    {% include "partials/sidebar.html" %}
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <h2>
+                    Screenshot Scanner
+                </h2>
+
+                <p class="muted">
+                    Scan a job post, offer letter or recruiter message screenshot.
+                </p>
+            </div>
+
+        </header>
+
+
+        <section class="scanner-box glass">
+
+            <div class="upload-icon">
+                ▣
+            </div>
+
+            <h2>
+                Upload Evidence
+            </h2>
+
+            <p>
+                Upload a job post, offer letter, WhatsApp or recruiter message screenshot.
+            </p>
+
+
+            <input
+                id="imageInput"
+                type="file"
+                accept="image/*"
+            >
+
+
+            <div id="preview"></div>
+
+
+            <button
+                type="button"
+                class="btn primary"
+                id="scanBtn"
+                disabled
+            >
+                Scan Image
+            </button>
+
+
+            <div class="progress">
+                <span id="progressBar"></span>
+            </div>
+
+
+            <div id="scanMessage"></div>
+
+
+            <div id="ocrTextBox" style="display:none;">
+
+                <h3>
+                    Extracted Text
+                </h3>
+
+                <div id="ocrText"></div>
+
+            </div>
+
+
+            <div
+                id="analysisResult"
+                class="security-analysis-box"
+                style="display:none;"
+            >
+
+                <div class="security-analysis-header">
+
+                    <span class="security-analysis-icon">
+                        🔎
+                    </span>
+
+                    <h3>
+                        Security Analysis
+                    </h3>
+
+                </div>
+
+
+                <div id="riskSummary">
+
+                    <div id="riskLevel"></div>
+
+                    <div id="riskScore"></div>
+
+                </div>
+
+
+                <div id="riskReasons">
+
+                    <h4>
+                        Detected Signals
+                    </h4>
+
+                    <ul id="reasonsList"></ul>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <div class="feature-row">
+
+
+            <div
+                class="panel glass scanner-feature-card"
+                id="ocrCard"
+            >
+
+                <b>
+                    🔍 OCR Extraction
+                </b>
+
+                <small id="ocrStatus">
+                    Waiting for screenshot.
+                </small>
+
+                <strong id="ocrValue">
+                    Waiting
+                </strong>
+
+            </div>
+
+
+            <div
+                class="panel glass scanner-feature-card"
+                id="aiCard"
+            >
+
+                <b>
+                    🧠 AI Analysis
+                </b>
+
+                <small id="aiStatus">
+                    Waiting for OCR text.
+                </small>
+
+                <strong id="aiValue">
+                    Waiting
+                </strong>
+
+            </div>
+
+
+            <div
+                class="panel glass scanner-feature-card"
+                id="riskCard"
+            >
+
+                <b>
+                    📊 Risk Score
+                </b>
+
+                <small id="riskStatus">
+                    Waiting for analysis.
+                </small>
+
+                <strong id="riskValue">
+                    --/100
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    const input = document.getElementById("imageInput");
+
+    const preview = document.getElementById("preview");
+
+    const btn = document.getElementById("scanBtn");
+
+    const progressBar = document.getElementById("progressBar");
+
+    const scanMessage = document.getElementById("scanMessage");
+
+    const ocrTextBox = document.getElementById("ocrTextBox");
+
+    const ocrText = document.getElementById("ocrText");
+
+    const analysisResult = document.getElementById("analysisResult");
+
+    const riskLevel = document.getElementById("riskLevel");
+
+    const riskScore = document.getElementById("riskScore");
+
+    const reasonsList = document.getElementById("reasonsList");
+
+
+    const ocrCard = document.getElementById("ocrCard");
+
+    const aiCard = document.getElementById("aiCard");
+
+    const riskCard = document.getElementById("riskCard");
+
+
+    const ocrStatus = document.getElementById("ocrStatus");
+
+    const ocrValue = document.getElementById("ocrValue");
+
+    const aiStatus = document.getElementById("aiStatus");
+
+    const aiValue = document.getElementById("aiValue");
+
+    const riskStatus = document.getElementById("riskStatus");
+
+    const riskValue = document.getElementById("riskValue");
+
+
+    let selectedFile = null;
+
+
+    function getCookie(name) {
+
+        const cookies = document.cookie.split(";");
+
+        for (let cookie of cookies) {
+
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + "=")) {
+
+                return decodeURIComponent(
+                    cookie.substring(name.length + 1)
+                );
+
+            }
+
+        }
+
+        return null;
+
+    }
+
+
+    function resetResults() {
+
+        progressBar.style.width = "0%";
+
+        scanMessage.innerHTML = "";
+
+        ocrTextBox.style.display = "none";
+
+        analysisResult.style.display = "none";
+
+
+        ocrStatus.textContent =
+            "Waiting for screenshot.";
+
+        ocrValue.textContent =
+            "Waiting";
+
+
+        aiStatus.textContent =
+            "Waiting for OCR text.";
+
+        aiValue.textContent =
+            "Waiting";
+
+
+        riskStatus.textContent =
+            "Waiting for analysis.";
+
+        riskValue.textContent =
+            "--/100";
+
+
+        riskLevel.textContent = "";
+
+        riskScore.textContent = "";
+
+        reasonsList.innerHTML = "";
+
+        riskLevel.className = "";
+
+        riskScore.className = "";
+
+    }
+
+
+    input.addEventListener("change", function () {
+
+        preview.innerHTML = "";
+
+        resetResults();
+
+
+        selectedFile = input.files[0];
+
+
+        if (!selectedFile) {
+
+            btn.disabled = true;
+
+            return;
+
+        }
+
+
+        if (!selectedFile.type.startsWith("image/")) {
+
+            scanMessage.innerHTML =
+                '<div class="notice error">Please select a valid image file.</div>';
+
+            btn.disabled = true;
+
+            selectedFile = null;
+
+            return;
+
+        }
+
+
+        const img = document.createElement("img");
+
+        img.src = URL.createObjectURL(selectedFile);
+
+        img.alt = "Uploaded screenshot";
+
+        preview.appendChild(img);
+
+
+        btn.disabled = false;
+
+        btn.textContent = "Scan Image";
+
+
+        ocrStatus.textContent =
+            "Screenshot ready for OCR.";
+
+    });
+
+
+    async function analyzeWithBackend(text) {
+
+        aiCard.classList.add("processing");
+
+        riskCard.classList.add("processing");
+
+
+        aiStatus.textContent =
+            "Analyzing extracted text...";
+
+        aiValue.textContent =
+            "Processing";
+
+
+        riskStatus.textContent =
+            "Calculating risk score...";
+
+        riskValue.textContent =
+            "Processing";
+
+
+        try {
+
+            const csrfToken = getCookie("csrftoken");
+
+
+            const response = await fetch(
+                "{% url 'analyze_screenshot' %}",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+
+                    body: JSON.stringify({
+                        text: text,
+                        url: ""
+                    })
+                }
+            );
+
+
+            const data = await response.json();
+
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.error || "Analysis failed."
+                );
+
+            }
+
+
+            aiCard.classList.remove("processing");
+
+            riskCard.classList.remove("processing");
+
+
+            aiStatus.textContent =
+                "Security analysis completed.";
+
+            aiValue.textContent =
+                "Analysis Complete";
+
+
+            riskStatus.textContent =
+                data.risk_level;
+
+
+            riskValue.textContent =
+                data.risk_score + "/100";
+
+
+            analysisResult.style.display =
+                "block";
+
+
+            riskLevel.textContent =
+                data.risk_level;
+
+
+            riskScore.textContent =
+                data.risk_score + "/100";
+
+
+            reasonsList.innerHTML = "";
+
+
+            if (
+                data.reasons &&
+                data.reasons.length > 0
+            ) {
+
+                data.reasons.forEach(function (reason) {
+
+                    const li =
+                        document.createElement("li");
+
+                    li.textContent =
+                        reason;
+
+                    reasonsList.appendChild(li);
+
+                });
+
+            } else {
+
+                const li =
+                    document.createElement("li");
+
+                li.textContent =
+                    "No major scam signals detected.";
+
+                reasonsList.appendChild(li);
+
+            }
+
+
+            if (data.risk_level === "High Risk") {
+
+                riskLevel.className =
+                    "risk-high";
+
+                riskScore.className =
+                    "risk-score-high";
+
+            }
+
+            else if (
+                data.risk_level === "Suspicious"
+            ) {
+
+                riskLevel.className =
+                    "risk-suspicious";
+
+                riskScore.className =
+                    "risk-score-suspicious";
+
+            }
+
+            else {
+
+                riskLevel.className =
+                    "risk-safe";
+
+                riskScore.className =
+                    "risk-score-safe";
+
+            }
+
+
+            progressBar.style.width =
+                "100%";
+
+
+            scanMessage.innerHTML =
+                '<div class="notice success">Screenshot analysis completed successfully.</div>';
+
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Backend analysis error:",
+                error
+            );
+
+
+            aiCard.classList.remove("processing");
+
+            riskCard.classList.remove("processing");
+
+
+            aiStatus.textContent =
+                "Analysis failed.";
+
+            aiValue.textContent =
+                "Error";
+
+
+            riskStatus.textContent =
+                "Unable to calculate.";
+
+            riskValue.textContent =
+                "--/100";
+
+
+            scanMessage.innerHTML =
+                '<div class="notice error">OCR completed, but security analysis could not be completed.</div>';
+
+        }
+
+    }
+
+
+    btn.addEventListener("click", async function () {
+
+
+        if (!selectedFile) {
+
+            scanMessage.innerHTML =
+                '<div class="notice error">Please upload a screenshot first.</div>';
+
+            return;
+
+        }
+
+
+        btn.disabled = true;
+
+        btn.textContent =
+            "Scanning...";
+
+
+        progressBar.style.width =
+            "5%";
+
+
+        scanMessage.innerHTML =
+            '<div class="notice">Reading screenshot text...</div>';
+
+
+        ocrCard.classList.add("processing");
+
+        aiCard.classList.remove("processing");
+
+        riskCard.classList.remove("processing");
+
+
+        ocrStatus.textContent =
+            "Extracting text from screenshot...";
+
+        ocrValue.textContent =
+            "Processing";
+
+
+        try {
+
+
+            const worker =
+                await Tesseract.createWorker("eng");
+
+
+            const result =
+                await worker.recognize(
+                    selectedFile
+                );
+
+
+            const text =
+                result.data.text.trim();
+
+
+            await worker.terminate();
+
+
+            progressBar.style.width =
+                "60%";
+
+
+            ocrCard.classList.remove("processing");
+
+
+            if (!text) {
+
+                ocrStatus.textContent =
+                    "No readable text detected.";
+
+                ocrValue.textContent =
+                    "No text";
+
+
+                aiStatus.textContent =
+                    "OCR did not return readable text.";
+
+                aiValue.textContent =
+                    "Waiting";
+
+
+                riskStatus.textContent =
+                    "Risk analysis unavailable.";
+
+                riskValue.textContent =
+                    "--/100";
+
+
+                scanMessage.innerHTML =
+                    '<div class="notice error">No readable text was found in this screenshot.</div>';
+
+
+                btn.disabled = false;
+
+                btn.textContent =
+                    "Scan Image";
+
+                return;
+
+            }
+
+
+            const words =
+                text
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .length;
+
+
+            ocrStatus.textContent =
+                "Text successfully extracted.";
+
+            ocrValue.textContent =
+                words + " words detected";
+
+
+            ocrText.textContent =
+                text;
+
+
+            ocrTextBox.style.display =
+                "block";
+
+
+            aiCard.classList.add("processing");
+
+
+            aiStatus.textContent =
+                "Sending extracted text for security analysis...";
+
+            aiValue.textContent =
+                "Analyzing";
+
+
+            progressBar.style.width =
+                "75%";
+
+
+            scanMessage.innerHTML =
+                '<div class="notice">OCR completed. Analyzing scam signals...</div>';
+
+
+            await analyzeWithBackend(text);
+
+
+            btn.disabled = false;
+
+            btn.textContent =
+                "Scan Again";
+
+
+            console.log(
+                "Extracted OCR text:",
+                text
+            );
+
+
+        }
+
+        catch (error) {
+
+
+            console.error(
+                "OCR error:",
+                error
+            );
+
+
+            ocrCard.classList.remove("processing");
+
+            aiCard.classList.remove("processing");
+
+            riskCard.classList.remove("processing");
+
+
+            progressBar.style.width =
+                "0%";
+
+
+            ocrStatus.textContent =
+                "OCR extraction failed.";
+
+            ocrValue.textContent =
+                "Failed";
+
+
+            aiStatus.textContent =
+                "Analysis not started.";
+
+            aiValue.textContent =
+                "Waiting";
+
+
+            riskStatus.textContent =
+                "Risk score unavailable.";
+
+            riskValue.textContent =
+                "--/100";
+
+
+            scanMessage.innerHTML =
+                '<div class="notice error">Unable to process the screenshot. Please try another image.</div>';
+
+
+            btn.disabled = false;
+
+            btn.textContent =
+                "Scan Image";
+
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

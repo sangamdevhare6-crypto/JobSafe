@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Admin Dashboard | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="app-shell">
+
+    {% include "partials/admin-sidebar.html" %}
+
+    <main class="main">
+
+
+        <!-- Topbar -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h2>
+                    Admin Dashboard
+                </h2>
+
+                <p class="muted">
+                    Monitor JobSafe activity and scam intelligence.
+                </p>
+
+            </div>
+
+            <div class="user-chip">
+                ⚡ Administrator
+            </div>
+
+        </header>
+
+
+        <!-- Statistics -->
+
+        <div class="stats">
+
+            <div class="stat blue">
+
+                <small>
+                    Total Users
+                </small>
+
+                <b>
+                    {{ users }}
+                </b>
+
+                <span>
+                    Registered accounts
+                </span>
+
+            </div>
+
+
+            <div class="stat purple">
+
+                <small>
+                    Job Checks
+                </small>
+
+                <b>
+                    {{ checks }}
+                </b>
+
+                <span>
+                    Analyses
+                </span>
+
+            </div>
+
+
+            <div class="stat red">
+
+                <small>
+                    Scam Reports
+                </small>
+
+                <b>
+                    {{ reports }}
+                </b>
+
+                <span>
+                    Submitted reports
+                </span>
+
+            </div>
+
+
+            <div class="stat green">
+
+                <small>
+                    Companies
+                </small>
+
+                <b>
+                    {{ companies }}
+                </b>
+
+                <span>
+                    Verification records
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Dashboard Grid -->
+
+        <div class="grid-2">
+
+
+            <!-- Platform Activity -->
+
+            <section class="panel glass">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Platform Activity
+                    </h2>
+
+                    <span>
+                        Live
+                    </span>
+
+                </div>
+
+
+                <div class="admin-bars">
+
+                    <i style="height: 45%;"></i>
+
+                    <i style="height: 72%;"></i>
+
+                    <i style="height: 55%;"></i>
+
+                    <i style="height: 88%;"></i>
+
+                    <i style="height: 65%;"></i>
+
+                    <i style="height: 94%;"></i>
+
+                    <i style="height: 78%;"></i>
+
+                </div>
+
+
+                <div class="chart-labels">
+                    Mon Tue Wed Thu Fri Sat Sun
+                </div>
+
+            </section>
+
+
+            <!-- Quick Management -->
+
+            <section class="panel glass">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Quick Management
+                    </h2>
+
+                </div>
+
+
+                <div class="admin-actions">
+
+                    <a href="{% url 'admin_users' %}">
+                        ♙ Manage Users →
+                    </a>
+
+                    <a href="{% url 'admin_reports' %}">
+                        ⚠ Review Reports →
+                    </a>
+
+                    <a href="{% url 'admin_companies' %}">
+                        ▦ Review Companies →
+                    </a>
+
+                    <a href="/admin/">
+                        ⚙ Django Admin →
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- Recent Reports -->
+
+        <section class="panel glass">
+
+            <div class="panel-title">
+
+                <h2>
+                    Recent Reports
+                </h2>
+
+                <a href="{% url 'admin_reports' %}">
+                    View All →
+                </a>
+
+            </div>
+
+
+            {% for r in recent_reports %}
+
+            <div class="list-item">
+
+                <b>
+                    {{ r.company }}
+                </b>
+
+                <span>
+                    {{ r.job_title }}
+                </span>
+
+                <small>
+                    {{ r.status }}
+                    •
+                    {{ r.created_at|date:"d M Y" }}
+                </small>
+
+            </div>
+
+
+            {% empty %}
+
+            <div class="empty">
+                No reports yet.
+            </div>
+
+            {% endfor %}
+
+        </section>
+
+
+    </main>
+
+</div>
+
+{% endblock %}

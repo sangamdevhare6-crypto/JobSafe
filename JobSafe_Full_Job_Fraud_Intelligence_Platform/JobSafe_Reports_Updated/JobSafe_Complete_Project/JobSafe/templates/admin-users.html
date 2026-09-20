@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Users | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="app-shell">
+
+    {% include "partials/admin-sidebar.html" %}
+
+    <main class="main">
+
+
+        <!-- Topbar -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h2>
+                    Users Management
+                </h2>
+
+                <p class="muted">
+                    Registered JobSafe accounts.
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- Users Table -->
+
+        <section class="panel glass">
+
+            <table>
+
+                <tr>
+
+                    <th>
+                        Username
+                    </th>
+
+                    <th>
+                        Name
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        Staff
+                    </th>
+
+                    <th>
+                        Joined
+                    </th>
+
+                </tr>
+
+
+                {% for u in users %}
+
+                <tr>
+
+                    <td>
+                        {{ u.username }}
+                    </td>
+
+                    <td>
+                        {{ u.first_name }}
+                    </td>
+
+                    <td>
+                        {{ u.email }}
+                    </td>
+
+                    <td>
+                        {{ u.is_staff }}
+                    </td>
+
+                    <td>
+                        {{ u.date_joined|date:"d M Y" }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Admin Login | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <div class="auth-card glass admin-auth">
+
+        <div class="auth-logo">
+            ⚡
+        </div>
+
+        <h1>
+            Admin Login
+        </h1>
+
+        <p>
+            Manage JobSafe reports and users.
+        </p>
+
+
+        {% if messages %}
+
+            {% for m in messages %}
+
+                <div class="notice">
+                    {{ m }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            <label>
+                Admin Username
+            </label>
+
+            <input
+                type="text"
+                name="username"
+                required
+            >
+
+
+            <label>
+                Password
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                required
+            >
+
+
+            <button
+                class="btn primary full"
+                type="submit"
+            >
+                Enter Admin Panel
+            </button>
+
+        </form>
+
+
+        <div class="auth-links">
+
+            <a href="{% url 'login' %}">
+                Back to user login
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

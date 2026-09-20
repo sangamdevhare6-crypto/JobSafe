@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Create Account | JobSafe
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <div class="auth-card glass">
+
+        <div class="auth-logo">
+            🛡
+        </div>
+
+        <h1>
+            Create Account
+        </h1>
+
+        <p>
+            Join JobSafe and stay protected.
+        </p>
+
+
+        {% if form.non_field_errors %}
+
+            <div class="notice">
+                {{ form.non_field_errors }}
+            </div>
+
+        {% endif %}
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            <label>
+                Full Name
+            </label>
+
+            {{ form.first_name }}
+
+
+            <label>
+                Username
+            </label>
+
+            {{ form.username }}
+
+
+            <label>
+                Email
+            </label>
+
+            {{ form.email }}
+
+
+            <label>
+                Password
+            </label>
+
+            {{ form.password }}
+
+
+            <label>
+                Confirm Password
+            </label>
+
+            {{ form.confirm_password }}
+
+
+            <button class="btn primary full">
+                Create Account
+            </button>
+
+        </form>
+
+
+        <div class="auth-links">
+
+            <a href="{% url 'login' %}">
+                Already have an account? Login
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
